@@ -19,3 +19,5 @@ print(y)
 
 # x = '3'
 # print(format(int(x, 16), 'b'))
+
+# exec(open('qf.py').read())

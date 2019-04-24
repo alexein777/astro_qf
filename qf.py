@@ -1,4 +1,6 @@
 import math
+# import matplotlib.pyplot as plt
+import numpy as np
 
 class Complex:
     def __init__(self, real=0, imag=0):
@@ -34,6 +36,9 @@ class Complex:
                     s += ' - {}i'.format(round(-self.imag, 3))
 
         return s
+
+    def __repr__(self):
+        return self.__str__()
 
     def getReal(self):
         return self.real
@@ -77,19 +82,43 @@ class Complex:
         return '{}(cos({}) + i*sin({}))'.format(round(self.modulus(), 3), \
             round(self.arg(), 3), round(self.arg(), 3))
 
+    def __round__(self, ndigits=0):
+        real = round(self.real, ndigits)
+        imag = round(self.imag, ndigits)
+
+        return Complex(real, imag)
+
+    def __abs__(self):
+        real = abs(self.real)
+        imag = abs(self.imag)
+
+        return Complex(real, imag)
+
     def __getitem__(self, index):
         if index == 0 or index == -2:
             return self.real
         elif index == 1 or index == -1:
             return self.imag
         else:
-            raise IndexError('Index error: index out of range')
+            raise IndexError('index out of range')
 
     def __eq__(self, z):
         if isinstance(z, Complex):
             return self.real == z.getReal() and self.imag == z.getImag()
         else:
-            return self.real == z
+            if self.imag == 0:
+                return self.real == z
+            else:
+                return False
+
+    def __ne__(self, z):
+        if isinstance(z, Complex):
+            return self.real != z.getReal() and self.imag != z.getImag()
+        else:
+            if self.imag == 0:
+                return self.real != z
+            else:
+                return True
 
     def __neg__(self):
         return Complex(-self.real, -self.imag)
@@ -215,15 +244,70 @@ class ComplexTrig(Complex):
         self.real = r * math.cos(phi)
         self.imag = r * math.sin(phi)
 
+    def __str__(self):
+        return super.__str__()
+
+    def __repr__(self):
+        return super.__repr__()
+
+# Napomena: ne radi ispis elemenata ubacenih u transformed zbog poziva funkcije round
+# u okviru __str__ metoda
 def qfourier(coeffs):
     N = len(coeffs)
     transformed = []
 
     for k in range(N):
-        bk = (1 / math.sqrt(N)) * Complex.csum([ComplexTrig( \
-            coeffs[j], 2 * math.pi * j * k / N) for j in range(N)])
-        # bk = (1 / math.sqrt(N)) * Complex.csum([Complex(coeffs[j] * \
-        #     math.cos(2 * math.pi * j * k / N), coeffs[j] * math.sin(2 * math.pi * j * k / N)) for j in range(N)])
+        bk = (1 / math.sqrt(N)) * Complex.csum([coeffs[j] * ComplexTrig( \
+            1, 2 * math.pi * j * k / N) for j in range(N)])
+
+        print(bk)
         transformed.append(bk)
 
     return transformed
+
+class Qubit:
+    def __init__(self, coeffs):
+        (bits_superpos, coeffs_len) = self._qlen(len(coeffs))
+
+        self.bits_superpos = bits_superpos
+        self.coeffs_len = coeffs_len
+        self.coeffs = coeffs
+
+        if len(coeffs) < self.coeffs_len:
+            for i in range(self.coeffs_len - len(coeffs)):
+                self.coeffs.append(0)
+
+    def __str__(self):
+        s = ''
+
+        for i in range(self.coeffs_len):
+            if self.coeffs[i] != 0:
+                s += f'({self.coeffs[i]})|{i:0{self.bits_superpos}b}>'
+
+            if i < self.coeffs_len - 1 and self.coeffs[i + 1] != 0:
+                s += ' + '
+
+        return s
+
+    def _qlen(self, list_len):
+        n = 0
+        deg2 = True
+
+        while list_len != 0:
+            if list_len != 1 and list_len % 2 != 0:
+                deg2 = False
+
+            list_len //= 2
+            n += 1
+
+        if not deg2:
+            return n, 2 ** n
+        else:
+            return n - 1, 2 ** (n - 1)
+
+    
+
+# plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
+# plt.show()
+
+# import _tkinter ne radi
