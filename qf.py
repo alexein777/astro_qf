@@ -1,6 +1,7 @@
 import math
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import numpy as np
+import random
 
 class Complex:
     def __init__(self, real=0, imag=0):
@@ -212,12 +213,19 @@ class Complex:
         return self
 
     def __truediv__(self, z):
-        mod = z.modulus()
-
         if isinstance(z, Complex):
-            res = 1 / mod * self * z.conjugate()
+            res = 1 / z.modulus() * self * z.conjugate()
         else:
-            res = 1 / mod * self
+            res = 1 / z * self
+
+        return res
+
+    def __rtruediv__(self, z):
+        if isinstance(z, Complex):
+            mod = z.modulus()
+            res = (1 / mod ** 2) * self * z.conjugate()
+        else:
+            res = z * self.conjugate() / (self.modulus() ** 2)
 
         return res
 
@@ -260,6 +268,7 @@ def qfourier(coeffs):
         bk = (1 / math.sqrt(N)) * Complex.csum([coeffs[j] * ComplexTrig( \
             1, 2 * math.pi * j * k / N) for j in range(N)])
 
+
         print(bk)
         transformed.append(bk)
 
@@ -275,19 +284,48 @@ class Qubit:
 
         if len(coeffs) < self.coeffs_len:
             for i in range(self.coeffs_len - len(coeffs)):
-                self.coeffs.append(0)
+                self.coeffs.append(Complex(0, 0))
+
+        self.normalize()
 
     def __str__(self):
         s = ''
 
         for i in range(self.coeffs_len):
             if self.coeffs[i] != 0:
+                # if self.coeffs[i].getReal in (1, -1) and self.coeffs[i].getImag() == 0:
+                #     s += f'|{i:0{self.bits_superpos}b}>'
                 s += f'({self.coeffs[i]})|{i:0{self.bits_superpos}b}>'
 
-            if i < self.coeffs_len - 1 and self.coeffs[i + 1] != 0:
+            if i not in (0, self.coeffs_len - 1) and self.coeffs[i + 1] != 0:
                 s += ' + '
 
         return s
+
+    def __len__(self):
+        return self.coeffs_len
+
+    def normalize(self):
+        norm = math.sqrt(sum(list(map(lambda c: c.modulus() ** 2, self.coeffs))))
+        self.coeffs = list(map(lambda c: c / norm, self.coeffs))
+
+    def measure(self):
+        random_value = random.random()
+
+        current_sum = 0
+        for i in range(self.coeffs_len):
+            current_sum += self.coeffs[i].modulus() ** 2
+
+            if current_sum > random_value:
+                print(f'Measured state: |{i:0{self.bits_superpos}b}>')
+
+                new_coeffs = [Complex(0, 0) for j in range(i)] + [Complex(1, 0)] + [Complex(0, 0) for j in range(i + 1, self.coeffs_len)]
+                self.coeffs = new_coeffs
+
+                break
+
+        
+
 
     def _qlen(self, list_len):
         n = 0
@@ -305,9 +343,5 @@ class Qubit:
         else:
             return n - 1, 2 ** (n - 1)
 
-    
-
-# plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
-# plt.show()
-
-# import _tkinter ne radi
+plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
+plt.show()
