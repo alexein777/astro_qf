@@ -293,17 +293,55 @@ class Qubit:
 
         for i in range(self.coeffs_len):
             if self.coeffs[i] != 0:
-                # if self.coeffs[i].getReal in (1, -1) and self.coeffs[i].getImag() == 0:
-                #     s += f'|{i:0{self.bits_superpos}b}>'
-                s += f'({self.coeffs[i]})|{i:0{self.bits_superpos}b}>'
+                if self.coeffs[i].getReal() in (1, -1) and self.coeffs[i].getImag() == 0:
+                    if self.coeffs[i].getReal() == -1 and s.strip() == '':
+                        s += f'-|{i:0{self.bits_superpos}b}>'
+                    else:
+                        s += f'|{i:0{self.bits_superpos}b}>'
+                elif self.coeffs[i].getReal() > 0 and self.coeffs[i].getImag() == 0:
+                    s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self.coeffs[i].getReal() < 0 and self.coeffs[i].getImag() == 0:
+                    if s.strip() == '':
+                        s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                    else:
+                        s += f'{-self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() in (1, -1):
+                    if self.coeffs[i].getImag() == -1 and s.strip() == '':
+                        s += f'-i|{i:0{self.bits_superpos}b}>'
+                    else:
+                        s += f'i|{i:0{self.bits_superpos}b}>'
+                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() > 0:
+                    s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() < 0:
+                    if s.strip() == '':
+                        s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                    else:
+                        s += f'{-self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                else:   
+                    s += f'({self.coeffs[i]})|{i:0{self.bits_superpos}b}>'
 
-            if i not in (0, self.coeffs_len - 1) and self.coeffs[i + 1] != 0:
-                s += ' + '
+            if i != self.coeffs_len - 1 and self.coeffs[i + 1] != 0 and s.strip() != '':
+                if self.coeffs[i + 1].getReal() > 0 and self.coeffs[i + 1].getImag() == 0:
+                    s += ' + '
+                elif self.coeffs[i + 1].getReal() < 0 and self.coeffs[i + 1].getImag() == 0:
+                    s += ' - '
+                elif self.coeffs[i + 1].getReal() == 0 and self.coeffs[i + 1].getImag() > 0:
+                    s += ' + '
+                elif self.coeffs[i + 1].getReal() == 0 and self.coeffs[i + 1].getImag() < 0:
+                    s += ' - '
+                else:
+                    s += ' + '
 
         return s
 
     def __len__(self):
         return self.coeffs_len
+
+    def getCoeffs(self):
+        return self.coeffs
+
+    def getBits(self):
+        return self.bits_superpos
 
     def normalize(self):
         norm = math.sqrt(sum(list(map(lambda c: c.modulus() ** 2, self.coeffs))))
@@ -321,11 +359,17 @@ class Qubit:
 
                 new_coeffs = [Complex(0, 0) for j in range(i)] + [Complex(1, 0)] + [Complex(0, 0) for j in range(i + 1, self.coeffs_len)]
                 self.coeffs = new_coeffs
-
                 break
 
-        
+    def tensproduct(self, q):
+        q_coeffs = q.getCoeffs()
+        new_coeffs = []
 
+        for i in range(self.coeffs_len):
+            for j in range(len(q)):
+                new_coeffs.append(self.coeffs[i] * q_coeffs[j])
+
+        return Qubit(new_coeffs)
 
     def _qlen(self, list_len):
         n = 0
@@ -343,5 +387,6 @@ class Qubit:
         else:
             return n - 1, 2 ** (n - 1)
 
-plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
-plt.show()
+# plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
+# plt.plot(list(map(lambda x: math.cos(x), list(np.arange(0, 4*math.pi, 0.01)))))
+# plt.show()
