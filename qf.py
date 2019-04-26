@@ -5,76 +5,86 @@ import random
 
 class Complex:
     def __init__(self, real=0, imag=0):
-        self.real = real
-        self.imag = imag
-    
+        self._real = real
+        self._imag = imag
+
+    @property
+    def real(self):
+        return self._real
+
+    @property
+    def imag(self):
+        return self._imag
+
+    @real.setter
+    def real(self, value):
+        if type(value) != float:
+            raise TypeError('value must be float')
+        else:
+            self._real = value
+
+    @imag.setter
+    def imag(self, value):
+        if type(value) != float:
+            raise TypeError('value must be float')
+        else:
+            self._imag = value
+
     def __str__(self):
         s = ''
 
-        if self.real == 0 and self.imag == 0:
+        if self._real == 0 and self._imag == 0:
             s += '0'
-        elif self.real == 0 and self.imag != 0:
-            if self.imag == 1:
+        elif self._real == 0 and self._imag != 0:
+            if self._imag == 1:
                 s += 'i'
-            elif self.imag == -1:
+            elif self._imag == -1:
                 s += '-i'
             else:
-                s += '{}i'.format(str(round(self.imag, 3)))
-        elif self.real != 0 and self.imag == 0:
-            s += str(round(self.real, 3))
+                s += '{}i'.format(str(round(self._imag, 3)))
+        elif self._real != 0 and self._imag == 0:
+            s += str(round(self._real, 3))
         else:
-            s += str(round(self.real, 3))
+            s += str(round(self._real, 3))
             
-            if self.imag > 0:
-                if self.imag == 1:
+            if self._imag > 0:
+                if self._imag == 1:
                     s += ' + i'
                 else:
-                    s += ' + {}i'.format(round(self.imag, 3))
+                    s += ' + {}i'.format(round(self._imag, 3))
             else:
-                if self.imag == -1:
+                if self._imag == -1:
                     s += ' - i'
                 else:
-                    s += ' - {}i'.format(round(-self.imag, 3))
+                    s += ' - {}i'.format(round(-self._imag, 3))
 
         return s
 
     def __repr__(self):
         return self.__str__()
 
-    def getReal(self):
-        return self.real
-
-    def getImag(self):
-        return self.imag
-
-    def setReal(self, real):
-        self.real = real
-
-    def setImag(self, imag):
-        self.imag = imag
-
     def modulus(self):
-        return math.sqrt(self.real ** 2 + self.imag ** 2)
+        return math.sqrt(self._real ** 2 + self._imag ** 2)
 
     def conjugate(self):
-        return Complex(self.real, -self.imag)
+        return Complex(self._real, -self._imag)
 
     def arg(self):
-        if self.real > 0 and self.imag > 0:
-            return math.atan(self.imag / self.real)
-        elif self.real < 0 and self.imag > 0:
-            return math.pi + math.atan(self.imag / self.real)
-        elif self.real > 0 and self.imag < 0:
-            return 2 * math.pi + math.atan(self.imag / self.real)
-        elif self.real < 0 and self.imag < 0:
-            return math.pi + math.atan(self.imag / self.real)
-        elif self.real > 0 and self.imag == 0:
+        if self._real > 0 and self._imag > 0:
+            return math.atan(self._imag / self._real)
+        elif self._real < 0 and self._imag > 0:
+            return math.pi + math.atan(self._imag / self._real)
+        elif self._real > 0 and self._imag < 0:
+            return 2 * math.pi + math.atan(self._imag / self._real)
+        elif self._real < 0 and self._imag < 0:
+            return math.pi + math.atan(self._imag / self._real)
+        elif self._real > 0 and self._imag == 0:
             return 0
-        elif self.real < 0 and self.imag == 0:
+        elif self._real < 0 and self._imag == 0:
             return math.pi
-        elif self.real == 0 and self.imag > 0:
+        elif self._real == 0 and self._imag > 0:
             return math.pi / 2
-        elif self.real == 0 and self.imag < 0:
+        elif self._real == 0 and self._imag < 0:
             return 3 * math.pi / 2
         else:
             return 0
@@ -84,137 +94,137 @@ class Complex:
             round(self.arg(), 3), round(self.arg(), 3))
 
     def __round__(self, ndigits=0):
-        real = round(self.real, ndigits)
-        imag = round(self.imag, ndigits)
+        real = round(self._real, ndigits)
+        imag = round(self._imag, ndigits)
 
         return Complex(real, imag)
 
     def __abs__(self):
-        real = abs(self.real)
-        imag = abs(self.imag)
+        real = abs(self._real)
+        imag = abs(self._imag)
 
         return Complex(real, imag)
 
     def __getitem__(self, index):
         if index == 0 or index == -2:
-            return self.real
+            return self._real
         elif index == 1 or index == -1:
-            return self.imag
+            return self._imag
         else:
             raise IndexError('index out of range')
 
     def __eq__(self, z):
         if isinstance(z, Complex):
-            return self.real == z.getReal() and self.imag == z.getImag()
+            return self._real == z.real and self._imag == z.imag
         else:
-            if self.imag == 0:
-                return self.real == z
+            if self._imag == 0:
+                return self._real == z
             else:
                 return False
 
     def __ne__(self, z):
         if isinstance(z, Complex):
-            return self.real != z.getReal() and self.imag != z.getImag()
+            return self._real != z.real and self._imag != z.imag
         else:
-            if self.imag == 0:
-                return self.real != z
+            if self._imag == 0:
+                return self._real != z
             else:
                 return True
 
     def __neg__(self):
-        return Complex(-self.real, -self.imag)
+        return Complex(-self._real, -self._imag)
 
     def __add__(self, z):
         if isinstance(z, Complex):
-            real = self.real + z.getReal()
-            imag = self.imag + z.getImag()
+            real = self._real + z.real
+            imag = self._imag + z.imag
         else:
-            real = self.real + z
-            imag = self.imag
+            real = self._real + z
+            imag = self._imag
 
         return Complex(real, imag)
 
     def __radd__(self, z):
         if isinstance(z, Complex):
-            real = self.real + z.getReal()
-            imag = self.imag + z.getImag()
+            real = self._real + z.real
+            imag = self._imag + z.imag
         else:
-            real = self.real + z
-            imag = self.imag
+            real = self._real + z
+            imag = self._imag
 
         return Complex(real, imag)
 
     def __iadd__(self, z):
         if isinstance(z, Complex):
-            self.real += z.getReal()
-            self.imag += z.getImag()
+            self._real += z.real
+            self._imag += z.imag
         else:
-            self.real += z
+            self._real += z
 
         return self
 
     def __sub__(self, z):
         if isinstance(z, Complex):
-            real = self.real - z.getReal()
-            imag = self.imag - z.getImag()
+            real = self._real - z.real
+            imag = self._imag - z.imag
         else:
-            real = self.real - z
-            imag = self.imag
+            real = self._real - z
+            imag = self._imag
 
         return Complex(real, imag)
 
     def __rsub__(self, z):
         if isinstance(z, Complex):
-            real = z.getReal() - self.real
-            imag = self.imag
+            real = z.real - self._real
+            imag = self._imag
         else:
-            real = z - self.real
-            imag = self.imag
+            real = z - self._real
+            imag = self._imag
 
         return Complex(real, imag)
 
     def __isub__(self, z):
         if isinstance(z, Complex):
-            self.real -= z.getReal()
-            self.imag -= z.getImag()
+            self._real -= z.real
+            self._imag -= z.imag
         else:
-            self.real -= z
+            self._real -= z
 
         return self
 
     def __mul__(self, z):
         if isinstance(z, Complex):
-            real = self.real * z.getReal() - self.imag * z.getImag()
-            imag = self.real * z.getImag() + self.imag * z.getReal()
+            real = self._real * z.real - self._imag * z.imag
+            imag = self._real * z.imag + self._imag * z.real
         else:
-            real = self.real * z
-            imag = self.imag * z
+            real = self._real * z
+            imag = self._imag * z
 
         return Complex(real, imag)
 
     def __rmul__(self, z):
         if isinstance(z, Complex):
-            real = self.real * z.getReal() - self.imag * z.getImag()
-            imag = self.real * z.getImag() + self.imag * z.getReal()
+            real = self._real * z.real - self._imag * z.imag
+            imag = self._real * z.imag + self._imag * z.real
         else:
-            real = self.real * z
-            imag = self.imag * z
+            real = self._real * z
+            imag = self._imag * z
 
         return Complex(real, imag)
 
     def __imul__(self, z):
         if isinstance(z, Complex):
-            self.real = self.real * z.getReal() - self.imag * z.getImag()
-            self.imag = self.real * z.getImag() + self.imag * z.getReal()
+            self._real = self._real * z.real - self._imag * z.imag
+            self._imag = self._real * z.imag + self._imag * z.real
         else:
-            self.real *= z
-            self.imag *= z
+            self._real *= z
+            self._imag *= z
 
         return self
 
     def __truediv__(self, z):
         if isinstance(z, Complex):
-            res = 1 / z.modulus() * self * z.conjugate()
+            res = (1 / z.modulus() ** 2) * self * z.conjugate()
         else:
             res = 1 / z * self
 
@@ -222,8 +232,7 @@ class Complex:
 
     def __rtruediv__(self, z):
         if isinstance(z, Complex):
-            mod = z.modulus()
-            res = (1 / mod ** 2) * self * z.conjugate()
+            res = (1 / z.modulus() ** 2) * self * z.conjugate()
         else:
             res = z * self.conjugate() / (self.modulus() ** 2)
 
@@ -249,8 +258,8 @@ class Complex:
 
 class ComplexTrig(Complex):
     def __init__(self, r, phi):
-        self.real = r * math.cos(phi)
-        self.imag = r * math.sin(phi)
+        self._real = r * math.cos(phi)
+        self._imag = r * math.sin(phi)
 
     def __str__(self):
         return super.__str__()
@@ -258,8 +267,6 @@ class ComplexTrig(Complex):
     def __repr__(self):
         return super.__repr__()
 
-# Napomena: ne radi ispis elemenata ubacenih u transformed zbog poziva funkcije round
-# u okviru __str__ metoda
 def qfourier(coeffs):
     N = len(coeffs)
     transformed = []
@@ -268,66 +275,76 @@ def qfourier(coeffs):
         bk = (1 / math.sqrt(N)) * Complex.csum([coeffs[j] * ComplexTrig( \
             1, 2 * math.pi * j * k / N) for j in range(N)])
 
-
-        print(bk)
         transformed.append(bk)
 
     return transformed
 
 class Qubit:
     def __init__(self, coeffs):
-        (bits_superpos, coeffs_len) = self._qlen(len(coeffs))
+        (bits_superpos, coeffs_len) = self.__qlen(len(coeffs))
 
-        self.bits_superpos = bits_superpos
-        self.coeffs_len = coeffs_len
-        self.coeffs = coeffs
+        self._bits_superpos = bits_superpos
+        self._coeffs_len = coeffs_len
+        self._coeffs = coeffs
 
-        if len(coeffs) < self.coeffs_len:
-            for i in range(self.coeffs_len - len(coeffs)):
-                self.coeffs.append(Complex(0, 0))
+        if len(coeffs) < self._coeffs_len:
+            for i in range(self._coeffs_len - len(coeffs)):
+                self._coeffs.append(Complex(0, 0))
 
         self.normalize()
+
+    @property
+    def bits_superpos(self):
+        return self._bits_superpos
+
+    @property
+    def coeffs_len(self):
+        return self._coeffs_len
+
+    @property
+    def coeffs(self):
+        return self._coeffs
 
     def __str__(self):
         s = ''
 
-        for i in range(self.coeffs_len):
-            if self.coeffs[i] != 0:
-                if self.coeffs[i].getReal() in (1, -1) and self.coeffs[i].getImag() == 0:
-                    if self.coeffs[i].getReal() == -1 and s.strip() == '':
+        for i in range(self._coeffs_len):
+            if self._coeffs[i] != 0:
+                if self._coeffs[i].real in (1, -1) and self._coeffs[i].imag == 0:
+                    if self._coeffs[i].real == -1 and s.strip() == '':
                         s += f'-|{i:0{self.bits_superpos}b}>'
                     else:
                         s += f'|{i:0{self.bits_superpos}b}>'
-                elif self.coeffs[i].getReal() > 0 and self.coeffs[i].getImag() == 0:
-                    s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
-                elif self.coeffs[i].getReal() < 0 and self.coeffs[i].getImag() == 0:
+                elif self._coeffs[i].real > 0 and self._coeffs[i].imag == 0:
+                    s += f'{self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self._coeffs[i].real < 0 and self._coeffs[i].imag == 0:
                     if s.strip() == '':
-                        s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                        s += f'{self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
                     else:
-                        s += f'{-self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
-                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() in (1, -1):
-                    if self.coeffs[i].getImag() == -1 and s.strip() == '':
+                        s += f'{-self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self._coeffs[i].real == 0 and self._coeffs[i].imag in (1, -1):
+                    if self._coeffs[i].imag == -1 and s.strip() == '':
                         s += f'-i|{i:0{self.bits_superpos}b}>'
                     else:
                         s += f'i|{i:0{self.bits_superpos}b}>'
-                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() > 0:
-                    s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
-                elif self.coeffs[i].getReal() == 0 and self.coeffs[i].getImag() < 0:
+                elif self._coeffs[i].real == 0 and self._coeffs[i].imag > 0:
+                    s += f'{self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                elif self._coeffs[i].real == 0 and self._coeffs[i].imag < 0:
                     if s.strip() == '':
-                        s += f'{self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                        s += f'{self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
                     else:
-                        s += f'{-self.coeffs[i]}|{i:0{self.bits_superpos}b}>'
+                        s += f'{-self._coeffs[i]}|{i:0{self.bits_superpos}b}>'
                 else:   
-                    s += f'({self.coeffs[i]})|{i:0{self.bits_superpos}b}>'
+                    s += f'({self._coeffs[i]})|{i:0{self.bits_superpos}b}>'
 
-            if i != self.coeffs_len - 1 and self.coeffs[i + 1] != 0 and s.strip() != '':
-                if self.coeffs[i + 1].getReal() > 0 and self.coeffs[i + 1].getImag() == 0:
+            if i != self._coeffs_len - 1 and self._coeffs[i + 1] != 0 and s.strip() != '':
+                if self._coeffs[i + 1].real > 0 and self._coeffs[i + 1].imag == 0:
                     s += ' + '
-                elif self.coeffs[i + 1].getReal() < 0 and self.coeffs[i + 1].getImag() == 0:
+                elif self._coeffs[i + 1].real < 0 and self._coeffs[i + 1].imag == 0:
                     s += ' - '
-                elif self.coeffs[i + 1].getReal() == 0 and self.coeffs[i + 1].getImag() > 0:
+                elif self._coeffs[i + 1].real == 0 and self._coeffs[i + 1].imag > 0:
                     s += ' + '
-                elif self.coeffs[i + 1].getReal() == 0 and self.coeffs[i + 1].getImag() < 0:
+                elif self._coeffs[i + 1].real == 0 and self._coeffs[i + 1].imag < 0:
                     s += ' - '
                 else:
                     s += ' + '
@@ -335,43 +352,41 @@ class Qubit:
         return s
 
     def __len__(self):
-        return self.coeffs_len
+        return self._coeffs_len
 
-    def getCoeffs(self):
-        return self.coeffs
-
-    def getBits(self):
-        return self.bits_superpos
+    def __getitem__(self, index):
+        return self._coeffs[index]
 
     def normalize(self):
-        norm = math.sqrt(sum(list(map(lambda c: c.modulus() ** 2, self.coeffs))))
-        self.coeffs = list(map(lambda c: c / norm, self.coeffs))
+        norm = math.sqrt(sum(list(map(lambda c: c.modulus() ** 2, self._coeffs))))
+        self._coeffs = list(map(lambda c: c / norm, self._coeffs))
 
     def measure(self):
         random_value = random.random()
 
         current_sum = 0
-        for i in range(self.coeffs_len):
-            current_sum += self.coeffs[i].modulus() ** 2
+        for i in range(self._coeffs_len):
+            current_sum += self._coeffs[i].modulus() ** 2
 
             if current_sum > random_value:
-                print(f'Measured state: |{i:0{self.bits_superpos}b}>')
+                print(f'Measured state: |{i:0{self._bits_superpos}b}>')
 
-                new_coeffs = [Complex(0, 0) for j in range(i)] + [Complex(1, 0)] + [Complex(0, 0) for j in range(i + 1, self.coeffs_len)]
-                self.coeffs = new_coeffs
+                new_coeffs = [Complex(0, 0) for j in range(i)] + [Complex(1, 0)] + \
+                    [Complex(0, 0) for j in range(i + 1, self._coeffs_len)]
+                self._coeffs = new_coeffs
                 break
 
     def tensproduct(self, q):
-        q_coeffs = q.getCoeffs()
+        # q_coeffs = q.coeffs
         new_coeffs = []
 
-        for i in range(self.coeffs_len):
+        for i in range(self._coeffs_len):
             for j in range(len(q)):
-                new_coeffs.append(self.coeffs[i] * q_coeffs[j])
+                new_coeffs.append(self._coeffs[i] * q.coeffs[j])
 
         return Qubit(new_coeffs)
 
-    def _qlen(self, list_len):
+    def __qlen(self, list_len):
         n = 0
         deg2 = True
 
@@ -387,6 +402,12 @@ class Qubit:
         else:
             return n - 1, 2 ** (n - 1)
 
-# plt.plot(list(map(lambda x: math.sin(x), list(np.arange(0, 4*math.pi, 0.01)))))
-# plt.plot(list(map(lambda x: math.cos(x), list(np.arange(0, 4*math.pi, 0.01)))))
-# plt.show()
+
+
+def main():
+    pass
+
+if __name__ == '__main__':
+    main()
+
+
