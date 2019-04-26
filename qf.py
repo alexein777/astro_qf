@@ -401,8 +401,6 @@ class Qubit:
         else:
             return n - 1, 2 ** (n - 1)
 
-
-
 def main():
     pass
 
