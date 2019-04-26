@@ -377,7 +377,6 @@ class Qubit:
                 break
 
     def tensproduct(self, q):
-        # q_coeffs = q.coeffs
         new_coeffs = []
 
         for i in range(self._coeffs_len):
