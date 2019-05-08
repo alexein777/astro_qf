@@ -31,5 +31,4 @@
 *.out
 *.app
 
-bit.py
 noise.py

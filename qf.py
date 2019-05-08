@@ -51,12 +51,12 @@ class Complex:
                 if self._imag == 1:
                     s += ' + i'
                 else:
-                    s += ' + {}i'.format(round(self._imag, 3))
+                    s += ' + {}i'.format(str(round(self._imag, 3)))
             else:
                 if self._imag == -1:
                     s += ' - i'
                 else:
-                    s += ' - {}i'.format(round(-self._imag, 3))
+                    s += ' - {}i'.format(str(round(-self._imag, 3)))
 
         return s
 
@@ -124,7 +124,7 @@ class Complex:
 
     def __ne__(self, z):
         if isinstance(z, Complex):
-            return self._real != z.real and self._imag != z.imag
+            return self._real != z.real or self._imag != z.imag
         else:
             if self._imag == 0:
                 return self._real != z
@@ -145,13 +145,9 @@ class Complex:
         return Complex(real, imag)
 
     def __radd__(self, z):
-        if isinstance(z, Complex):
-            real = self._real + z.real
-            imag = self._imag + z.imag
-        else:
-            real = self._real + z
-            imag = self._imag
-
+        real = self._real + z
+        imag = self._imag
+            
         return Complex(real, imag)
 
     def __iadd__(self, z):
@@ -174,12 +170,8 @@ class Complex:
         return Complex(real, imag)
 
     def __rsub__(self, z):
-        if isinstance(z, Complex):
-            real = z.real - self._real
-            imag = self._imag
-        else:
-            real = z - self._real
-            imag = self._imag
+        real = z - self._real
+        imag = -self._imag
 
         return Complex(real, imag)
 
@@ -203,12 +195,8 @@ class Complex:
         return Complex(real, imag)
 
     def __rmul__(self, z):
-        if isinstance(z, Complex):
-            real = self._real * z.real - self._imag * z.imag
-            imag = self._real * z.imag + self._imag * z.real
-        else:
-            real = self._real * z
-            imag = self._imag * z
+        real = self._real * z
+        imag = self._imag * z
 
         return Complex(real, imag)
 
@@ -231,11 +219,7 @@ class Complex:
         return res
 
     def __rtruediv__(self, z):
-        if isinstance(z, Complex):
-            res = (1 / z.modulus() ** 2) * self * z.conjugate()
-        else:
-            res = z * self.conjugate() / (self.modulus() ** 2)
-
+        res = z * self.conjugate() / (self.modulus() ** 2)
         return res
 
     def __pow__(self, k):
@@ -247,6 +231,18 @@ class Complex:
 
         return Complex(real, imag)
 
+    def sin(self):
+        real = math.sin(self.real) * math.cosh(self.imag)
+        imag = math.cos(self.real) * math.sinh(self.imag)
+
+        return Complex(real, imag)
+
+    def cos(self):
+        real = math.cos(self.real) * math.cosh(self.imag)
+        imag = math.sin(self.real) * math.sinh(self.imag)
+
+        return Complex(real, -imag)
+
     @classmethod
     def csum(self, list_complex):
         z = Complex()
@@ -255,6 +251,32 @@ class Complex:
             z += list_complex[i]
 
         return z
+
+    @classmethod
+    def csin(self, list_complex):
+        return list(map(lambda x: x.sin(), list_complex))
+
+    @classmethod
+    def ccos(self, list_complex):
+        return list(map(lambda x: x.cos(), list_complex))
+
+    @classmethod
+    def random(self, start=-10, stop=10):
+        real = (stop - start) * random.random() + start
+        imag = (stop - start) * random.random() + start
+
+        return Complex(real, imag)
+
+    @classmethod
+    def crandom(self, size=50, start=-10, stop=10):
+        return [Complex.random(start, stop) for i in range(size)]
+
+    @classmethod
+    def plot(self, list_complex, color_string='bo', label_str=''):
+        if type(list_complex) == list:
+            plt.plot([c.real for c in list_complex], [c.imag for c in list_complex], color_string, label=label_str)
+        else:
+            raise TypeError('plot accepts list of complex numbers (class Complex)')
 
 class ComplexTrig(Complex):
     def __init__(self, r, phi):
@@ -266,19 +288,7 @@ class ComplexTrig(Complex):
 
     def __repr__(self):
         return super.__repr__()
-
-def qfourier(coeffs):
-    N = len(coeffs)
-    transformed = []
-
-    for k in range(N):
-        bk = (1 / math.sqrt(N)) * Complex.csum([coeffs[j] * ComplexTrig( \
-            1, 2 * math.pi * j * k / N) for j in range(N)])
-
-        transformed.append(bk)
-
-    return transformed
-
+    
 class Qubit:
     def __init__(self, coeffs):
         (bits_superpos, coeffs_len) = self.__qlen(len(coeffs))
@@ -351,6 +361,9 @@ class Qubit:
 
         return s
 
+    def __repr__(self):
+        return self.__str__()
+
     def __len__(self):
         return self._coeffs_len
 
@@ -401,8 +414,74 @@ class Qubit:
         else:
             return n - 1, 2 ** (n - 1)
 
+    @classmethod
+    def random(self, coeffs_size=2):
+        return Qubit(Complex.crandom(coeffs_size))
+
+    @classmethod
+    def qrandom(self, list_size=20, qubit_size=2):
+        return [Qubit.random(qubit_size) for i in range(list_size)]
+
+    @classmethod
+    def plot(self, qubit, color_string='bo', label_str=''):
+        if isinstance(qubit, Qubit):
+            Complex.plot(qubit.coeffs, color_string, label_str)
+        elif type(qubit) == list:
+            Complex.plot(qubit, color_string, label_str)
+        else:
+            raise TypeError('plot accepts Qubit or list type')
+
+def qfourier(coeffs):
+    transformed = []
+
+    if isinstance(coeffs, Qubit):
+        N = coeffs.coeffs_len
+    
+        for k in range(N):
+            bk = (1 / math.sqrt(N)) * Complex.csum([coeffs.coeffs[j] * ComplexTrig( \
+                1, 2 * math.pi * j * k / N) for j in range(N)])
+    
+            transformed.append(bk)
+    elif type(coeffs) == list:
+        N = len(coeffs)
+
+        for k in range(N):
+            bk = (1 / math.sqrt(N)) * Complex.csum([coeffs[j] * ComplexTrig( \
+                1, 2 * math.pi * j * k / N) for j in range(N)])
+
+            transformed.append(bk)
+    else:
+        raise TypeError('qfourier accepts list of complex numbers (class Complex) or qubit (class Qubit)')
+
+    return transformed
+
 def main():
-    pass
+    complex_li = Complex.crandom(50)
+    complex_transformed = qfourier(complex_li)
+
+    q = Qubit.random(16)
+    q_transformed = Qubit(qfourier(q))
+
+    fig_size = plt.gcf()
+    fig_size.set_size_inches(7, 12)
+
+    # Reprezentacija komplkesnih brojeva
+    plt.figure(1)
+    plt.subplot(211)
+    plt.ylabel('imag')
+    Complex.plot(complex_li, label_str='complex numbers')
+    Complex.plot(complex_transformed, 'ro', 'transformed complex numbers')
+    plt.legend(loc='upper right', fontsize='small', bbox_to_anchor=(1.1, 1.1))
+
+    # Reprezentacija kjubita
+    plt.subplot(212)
+    plt.xlabel('real')
+    plt.ylabel('imag')
+    Qubit.plot(q, label_str='initial qubit')
+    Qubit.plot(q_transformed, 'ro', 'transformed qubit')
+    plt.legend(loc='upper right', fontsize='small', bbox_to_anchor=(1.1, 1.1))
+
+    plt.show()
 
 if __name__ == '__main__':
     main()
