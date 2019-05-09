@@ -32,4 +32,5 @@
 *.app
 
 bit.py
-noise.py
+__init__.py
+__pycache__
