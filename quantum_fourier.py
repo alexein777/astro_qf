@@ -454,3 +454,4 @@ def qfourier(coeffs):
         raise TypeError('qfourier accepts list of complex numbers (class Complex) or qubit (class Qubit)')
 
     return transformed
+
