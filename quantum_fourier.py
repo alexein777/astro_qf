@@ -272,11 +272,61 @@ class Complex:
         return [Complex.random(start, stop) for i in range(size)]
 
     @classmethod
-    def plot(self, list_complex, color_string='bo', label_str=''):
+    def plot(self, list_complex, color_string='bo', label_str='', marker_size=None):
         if type(list_complex) == list:
-            plt.plot([c.real for c in list_complex], [c.imag for c in list_complex], color_string, label=label_str)
+            plt.plot([c.real for c in list_complex], [c.imag for c in list_complex], color_string, label=label_str, markersize=marker_size)
         else:
             raise TypeError('plot accepts list of complex numbers (class Complex)')
+
+    @classmethod
+    def create_circle(self, center=(0, 0), radius=1, num=50):
+        return [Complex(radius * np.cos(phi), radius* np.sin(phi)) \
+            for phi in np.linspace(0, 2 * np.pi, num, endpoint=False)]
+
+    @classmethod
+    def create_square(self, center=(0, 0), edge=1, num=50):
+        bottom_left = (center[0] - edge / 2, center[1] - edge / 2)
+        b_x = bottom_left[0]
+        b_y = bottom_left[1]
+
+        dots_per_edge = num // 4
+        mid_dots = (num - 4) // 4
+        edge_step = edge / dots_per_edge 
+
+        corners = [Complex(b_x, b_y), Complex(b_x + edge, b_y), \
+            Complex(b_x, b_y + edge), Complex(b_x + edge, b_y + edge)]
+        bottom = [Complex(x, b_y) for x in \
+            [x1 for x1 in np.arange(b_x + edge_step, b_x + edge, edge_step)]]
+        top = [Complex(x, b_y + edge) for x in \
+            [x1 for x1 in np.arange(b_x + edge_step, b_x + edge, edge_step)]]
+        left = [Complex(b_x, y) for y in \
+            [y1 for y1 in np.arange(b_y + edge_step, b_y + edge, edge_step)]]
+        right = [Complex(b_x + edge, y) for y in \
+            [y1 for y1 in np.arange(b_y + edge_step, b_y + edge , edge_step)]]
+        remain = []
+
+        if (num % 4 != 0):
+            diff = num % 4
+
+            for i in range(diff):
+                rand_edge = random.choice(['bottom', 'top', 'left', 'right'])
+
+                if rand_edge == 'bottom':
+                    rand_x = b_x + edge * random.random()
+                    c = Complex(rand_x, b_y)
+                elif rand_edge == 'top':
+                    rand_x = b_x + edge * random.random()
+                    c = Complex(rand_x, b_y + edge)
+                elif rand_edge == 'left':
+                    rand_y = b_y + edge * random.random()
+                    c = Complex(b_x, rand_y)
+                else:
+                    rand_y = b_y + edge * random.random()
+                    c = Complex(b_x + edge, rand_y)
+
+                remain.append(c)
+                    
+        return corners + bottom + top + left + right + remain
 
 class ComplexTrig(Complex):
     def __init__(self, r, phi):
@@ -423,11 +473,11 @@ class Qubit:
         return [Qubit.random(qubit_size) for i in range(list_size)]
 
     @classmethod
-    def plot(self, qubit, color_string='bo', label_str=''):
+    def plot(self, qubit, color_string='bo', label_str='', marker_size=None):
         if isinstance(qubit, Qubit):
-            Complex.plot(qubit.coeffs, color_string, label_str)
+            Complex.plot(qubit.coeffs, color_string, label_str, marker_size)
         elif type(qubit) == list:
-            Complex.plot(qubit, color_string, label_str)
+            Complex.plot(qubit, color_string, label_str, marker_size)
         else:
             raise TypeError('plot accepts Qubit or list type')
 

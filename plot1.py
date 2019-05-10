@@ -15,8 +15,8 @@ def main():
     plt.figure(1)
     plt.subplot(211)
     plt.ylabel('imag')
-    Complex.plot(complex_li, label_str='complex numbers')
-    Complex.plot(complex_transformed, 'ro', 'transformed complex numbers')
+    Complex.plot(complex_li, label_str='complex numbers', marker_size=5)
+    Complex.plot(complex_transformed, 'r^', 'transformed complex numbers')
     plt.legend(loc='upper right', fontsize='small', bbox_to_anchor=(1.1, 1.1))
 
     # Reprezentacija kjubita
