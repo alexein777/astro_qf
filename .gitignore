@@ -33,5 +33,7 @@
 
 bit.py
 test.py
+test2.py
+plot3d.py
 __init__.py
 __pycache__

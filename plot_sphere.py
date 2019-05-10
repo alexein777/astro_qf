@@ -1,36 +1,45 @@
 from mpl_toolkits.mplot3d import Axes3D
-from quantum_fourier import Complex, Qubit, qfourier
+from quantum_fourier import *
 import matplotlib.pyplot as plt
 import numpy as np
 import math
 
 def main():
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
+    fig_size = plt.gcf()
+    fig_size.set_size_inches(12, 6)
 
-    xs = []
-    ys = []
-    zs = []
+    # qubit Bloch
+    ax = fig.add_subplot(121, projection='3d')
 
-    points = 700
-    r = 1
-
-    p_root = int(math.floor(math.sqrt(points)))
-    # for phi in np.arange(0, 2 * np.pi, np.pi / 20):
-    #     for theta in np.arange(0, np.pi, np.pi / 20):
-    for phi in np.linspace(0, 2 * np.pi, p_root):
-        for theta in np.linspace(0, np.pi, p_root):
-            xs.append(r * np.cos(phi) * np.sin(theta))
-            ys.append(r * np.sin(phi) * np.sin(theta))
-            zs.append(r * np.cos(theta))
+    qubit_sphere = QubitBloch.create_sphere(num=576)
+    QubitBloch.qscatter(qubit_sphere, ax, labelq='qubit on Bloch\'s sphere')
 
     ax.set_zlim(-1, 1)
-    ax.scatter(xs, ys, zs)
-    
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+# 
     ax.set_xlabel('x-axis')
     ax.set_ylabel('y-axis')
     ax.set_zlabel('z-axis')
 
+    plt.legend(loc='upper right', fontsize='small')
+
+    # transformed qubit Bloch
+    ax_t = fig.add_subplot(122, projection='3d')
+    qsphere_transformed = qfourier(qubit_sphere)
+    QubitBloch.qscatter(qsphere_transformed, ax_t, colorq='r', markerq='^', labelq='transformed qubit on Bloch\'s sphere')
+
+    ax_t.set_zlim(-1, 1)
+    ax_t.set_xlim(-1, 1)
+    ax_t.set_ylim(-1, 1)
+# 
+    ax_t.set_xlabel('x-axis')
+    ax_t.set_ylabel('y-axis')
+    ax_t.set_zlabel('z-axis')
+
+    plt.legend(loc='upper right', fontsize='small')
+# 
     plt.show()
 
 if __name__ == '__main__':
