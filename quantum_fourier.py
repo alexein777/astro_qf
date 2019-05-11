@@ -291,7 +291,7 @@ class Complex:
 
     @classmethod
     def create_circle(self, center=(0, 0), radius=1, num=50):
-        return [Complex(radius * np.cos(phi), radius* np.sin(phi)) \
+        return [Complex(center[0] + radius * np.cos(phi), center[1] + radius * np.sin(phi)) \
             for phi in np.linspace(0, 2 * np.pi, num, endpoint=False)]
 
     @classmethod
@@ -599,4 +599,3 @@ def qfourier(list_param):
         raise TypeError('unsupported type for QFT')
 
     return transformed
-

@@ -14,7 +14,7 @@ def main():
 
     plt.figure(1)
 
-    # Reprezentacija komplkesnih brojeva
+    # complex, transformed complex
     plt.subplot(121)
     plt.xlabel('real')
     plt.ylabel('imag')
@@ -22,7 +22,7 @@ def main():
     Complex.plot(complex_transformed, 'r^', 'transformed complex numbers')
     plt.legend(loc='upper center', fontsize='small', bbox_to_anchor=(0.5, 1.111))
 
-    # Reprezentacija kjubita
+    # qubit, transformed qubit
     plt.subplot(122)
     plt.xlabel('real')
     plt.ylabel('imag')
