@@ -461,6 +461,8 @@ class Qubit:
                 self._coeffs = new_coeffs
                 break
 
+        return self
+
     def tensproduct(self, q):
         new_coeffs = []
 
@@ -507,15 +509,15 @@ class QubitBloch(Qubit):
     def __init__(self, theta=0, phi=0, coeffs=None):
         if coeffs != None:
             if type(coeffs) == list:
-                if len(coeffs) > 2:
+                if len(coeffs) < 2:
                     raise ValueError('incorrect coeffs length for qubit on Bloch\'s sphere (expected 2)')
                 else:
                     self._theta = 2 * math.acos(coeffs[0].real)
                     self._phi = coeffs[1].arg()
-                    
+
                     self._bits_superpos = 1
                     self._coeffs_len = 2
-                    self._coeffs = coeffs
+                    self._coeffs = coeffs[:2]
             else:
                 raise ValueError('expected list of Complex coeffs, given {}'.format(type(coeffs)))
         else:
