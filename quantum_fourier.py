@@ -101,7 +101,7 @@ class Complex:
             return 0
 
     def trigform(self):
-        return '{}(cos({}) + i*sin({}))'.format(round(self.modulus(), 3), \
+        return '{}*(cos({}) + i*sin({}))'.format(round(self.modulus(), 3), \
             round(self.arg(), 3), round(self.arg(), 3))
 
     def __round__(self, ndigits=0):
@@ -165,8 +165,11 @@ class Complex:
         if isinstance(z, Complex):
             self._real += z.real
             self._imag += z.imag
+            self._real_rounded = round(self._real, 3)
+            self._imag_rounded = round(self._imag, 3)
         else:
             self._real += z
+            self._real_rounded = round(self._real, 3)
 
         return self
 
@@ -190,8 +193,11 @@ class Complex:
         if isinstance(z, Complex):
             self._real -= z.real
             self._imag -= z.imag
+            self._real_rounded = round(self._real, 3)
+            self._imag_rounded = round(self._imag, 3)
         else:
             self._real -= z
+            self._real_rounded = round(self._real, 3)
 
         return self
 
@@ -215,9 +221,13 @@ class Complex:
         if isinstance(z, Complex):
             self._real = self._real * z.real - self._imag * z.imag
             self._imag = self._real * z.imag + self._imag * z.real
+            self._real_rounded = round(self._real, 3)
+            self._imag_rounded = round(self._imag, 3)
         else:
             self._real *= z
             self._imag *= z
+            self._real_rounded = round(self._real, 3)
+            self._imag_rounded = round(self._imag, 3)
 
         return self
 
@@ -230,8 +240,7 @@ class Complex:
         return res
 
     def __rtruediv__(self, z):
-        res = z * self.conjugate() / (self.modulus() ** 2)
-        return res
+        return z * self.conjugate() / (self.modulus() ** 2)
 
     def __pow__(self, k):
         arg = self.arg()
@@ -498,12 +507,15 @@ class QubitBloch(Qubit):
     def __init__(self, theta=0, phi=0, coeffs=None):
         if coeffs != None:
             if type(coeffs) == list:
-                self._theta = 2 * math.acos(coeffs[0].real)
-                self._phi = coeffs[1].arg()
-                
-                self._bits_superpos = 1
-                self._coeffs_len = 2
-                self._coeffs = coeffs
+                if len(coeffs) > 2:
+                    raise ValueError('incorrect coeffs length for qubit on Bloch\'s sphere (expected 2)')
+                else:
+                    self._theta = 2 * math.acos(coeffs[0].real)
+                    self._phi = coeffs[1].arg()
+                    
+                    self._bits_superpos = 1
+                    self._coeffs_len = 2
+                    self._coeffs = coeffs
             else:
                 raise ValueError('expected list of Complex coeffs, given {}'.format(type(coeffs)))
         else:
@@ -581,21 +593,24 @@ def qfourier(list_param):
     
             transformed.append(bk)
     elif type(list_param) == list:
-        if isinstance(list_param[0], Complex):
-            N = len(list_param)
-    
-            for k in range(N):
-                bk = (1 / math.sqrt(N)) * Complex.csum([list_param[j] * \
-                    ComplexTrig(2 * math.pi * j * k / N) for j in range(N)])
-    
-                transformed.append(bk)
-        elif isinstance(list_param[0], QubitBloch):
-            transformed = list(map(lambda q: QubitBloch(coeffs=qfourier(q.coeffs)), list_param))
-        elif isinstance(list_param[0], Qubit):
-            transformed = list(map(lambda q: Qubit(qfourier(q.coeffs)), list_param))
+        if len(list_param) > 0:
+            if isinstance(list_param[0], Complex):
+                N = len(list_param)
+        
+                for k in range(N):
+                    bk = (1 / math.sqrt(N)) * Complex.csum([list_param[j] * \
+                        ComplexTrig(2 * math.pi * j * k / N) for j in range(N)])
+        
+                    transformed.append(bk)
+            elif isinstance(list_param[0], QubitBloch):
+                transformed = list(map(lambda q: QubitBloch(coeffs=qfourier(q.coeffs)), list_param))
+            elif isinstance(list_param[0], Qubit):
+                transformed = list(map(lambda q: Qubit(qfourier(q.coeffs)), list_param))
+            else:
+                raise TypeError('unsupported object type for QFT')
         else:
-            raise TypeError('unsupported type for QFT')
+            raise ValueError('empty list of coeffs')
     else:
-        raise TypeError('unsupported type for QFT')
+        raise TypeError('unsupported collection type for QFT')
 
     return transformed
