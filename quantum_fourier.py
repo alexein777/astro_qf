@@ -52,22 +52,22 @@ class Complex:
             elif self._imag_rounded == -1:
                 s += '-i'
             else:
-                s += '{}i'.format(str(round(self._imag_rounded, 3)))
+                s += '{}i'.format(str(self._imag_rounded))
         elif self._real_rounded != 0 and self._imag_rounded == 0:
-            s += str(round(self._real_rounded, 3))
+            s += str(round(self._real_rounded))
         else:
-            s += str(round(self._real_rounded, 3))
+            s += str(round(self._real_rounded))
             
             if self._imag_rounded > 0:
                 if self._imag_rounded == 1:
                     s += ' + i'
                 else:
-                    s += ' + {}i'.format(str(round(self._imag_rounded, 3)))
+                    s += ' + {}i'.format(str(self._imag_rounded))
             else:
                 if self._imag_rounded == -1:
                     s += ' - i'
                 else:
-                    s += ' - {}i'.format(str(round(-self._imag_rounded, 3)))
+                    s += ' - {}i'.format(str(-self._imag_rounded))
 
         return s
 
