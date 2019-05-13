@@ -233,7 +233,7 @@ class Complex:
         res = z * self.conjugate() / (self.modulus() ** 2)
         return res
 
-    def __pow__(self, k):
+    def __pow__(self, k=5):
         arg = self.arg()
         mod = self.modulus()
 
