@@ -22,8 +22,11 @@ def main():
     plt.legend()
 
     # circle, transformed circle
-    circle = Complex.create_circle(radius=1.5, num=40)
+    circle = Complex.create_circle(radius=1.5, num=40, center=(1.5, 1.5))
     circle_transformed = qfourier(circle)
+
+    # for c in circle_transformed:
+    #     print('({}, {})'.format(c.real, c.imag))
 
     plt.subplot(122)
     plt.xlabel('real')

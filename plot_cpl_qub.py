@@ -18,8 +18,8 @@ def main():
     plt.subplot(121)
     plt.xlabel('real')
     plt.ylabel('imag')
-    Complex.plot(complex_li, label_str='complex numbers', marker_size=5)
-    Complex.plot(complex_transformed, 'r^', 'transformed complex numbers')
+    Complex.plot(complex_li, label_str='complex number', marker_size=5)
+    Complex.plot(complex_transformed, 'r^', 'transformed complex number')
     plt.legend(loc='upper center', fontsize='small', bbox_to_anchor=(0.5, 1.111))
 
     # qubit, transformed qubit
